@@ -44,7 +44,7 @@ while cap.isOpened():
 
         if len(sequence) == 30:
             input_data = np.expand_dims(sequence, axis=0)  # shape: (1, 30, 63)
-            prediction = model.predict(input_data)[0]
+            prediction = model.predict(input_data, verbose=0)[0]
             predicted_label = gestures[np.argmax(prediction)]
             confidence = np.max(prediction)
 

@@ -64,9 +64,15 @@ for label in gestures:
         if cv2.waitKey(10) & 0xFF == ord('q'):
             break
 
-    # 저장
-    np.save(os.path.join(DATA_PATH, f'{label}.npy'), np.array(data))
+    save_path = os.path.join(DATA_PATH, f'{label}.npy')
+
+    if os.path.exists(save_path):
+        existing_data = np.load(save_path)
+        data = np.concatenate((existing_data, data), axis=0)
+
+    np.save(save_path, np.array(data))
     print(f"✅ '{label}' 수집 완료! 총 {len(data)}개 sequence 저장됨")
+
 
 cap.release()
 cv2.destroyAllWindows()
