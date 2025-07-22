@@ -8,7 +8,7 @@ import time  # ⬅️ shot 지속시간 체크용
 gestures = ['fire', 'hi', 'hit', 'none', 'nono', 'nyan', 'shot']
 
 # 모델 로드
-model = load_model('./손 동적 모델 data 수집/gesture_rnn_model.h5')
+model = load_model('./손 동적 모델 data 수집/gesture_rnn_model1.h5')
 
 # MediaPipe 설정
 mp_hands = mp.solutions.hands

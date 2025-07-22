@@ -11,7 +11,7 @@ mp_drawing = mp.solutions.drawing_utils
 
 # 저장 경로 및 제스처 목록
 DATA_PATH = os.path.join(os.getcwd(), 'gesture_data')
-gestures = ['none']
+gestures = ['fire', 'shot', 'nono', 'hit', 'hi', 'nyan', 'none']
 sequence_length = 30  # 1 sequence = 30프레임
 record_time = 300  # 제스처당 수집 시간 (초)
 
