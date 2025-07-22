@@ -10,10 +10,10 @@ hands = mp_hands.Hands(max_num_hands=1, min_detection_confidence=0.7)
 mp_drawing = mp.solutions.drawing_utils
 
 # 저장 경로 및 제스처 목록
-DATA_PATH = 'gesture_data'
-gestures = ['fire', 'shot', 'nono', 'hit', 'hi', 'nyan']
+DATA_PATH = os.path.join(os.getcwd(), 'gesture_data')
+gestures = ['none']
 sequence_length = 30  # 1 sequence = 30프레임
-record_time = 30  # 제스처당 수집 시간 (초)
+record_time = 300  # 제스처당 수집 시간 (초)
 
 # 키포인트 추출 함수
 def extract_keypoints(results):
