@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import mediapipe as mp
 from tensorflow.keras.models import load_model
-import time  # ⬅️ shot 지속시간 체크용
+import time  
 
 # 제스처 라벨 순서
 gestures = ['fire', 'hi', 'hit', 'none', 'nono', 'nyan', 'shot']
@@ -65,12 +65,17 @@ while cap.isOpened():
         sequence.append(keypoints)
         sequence = sequence[-30:]
 
+        threshold = 0.8  # 신뢰도 기준 설정
+
         if len(sequence) == 30:
             input_data = np.expand_dims(sequence, axis=0)
             prediction = model.predict(input_data, verbose=0)[0]
             predicted_label = gestures[np.argmax(prediction)]
             confidence = np.max(prediction)
 
+            # 🔒 confidence가 낮으면 그냥 'none' 처리
+            if confidence < threshold:
+                predicted_label = 'none'
             # 결과 표시
             cv2.putText(img, f'{predicted_label} ({confidence:.2f})', (10, 40),
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
