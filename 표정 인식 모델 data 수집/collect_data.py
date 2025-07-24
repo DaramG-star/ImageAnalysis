@@ -2,7 +2,7 @@ import cv2
 import os
 
 # 사용할 표정 라벨 리스트
-expressions = ['yawn', 'serious', 'laugh', 'surprise', 'ugly']
+expressions = ['surprise', 'serious', 'laugh', 'ugly', 'yawn']
 current_idx = 0
 img_counts = {}
 for label in expressions:
@@ -35,7 +35,7 @@ while True:
     elif key == ord('d'):  # → next
         current_idx = (current_idx + 1) % len(expressions)
     elif key == ord('s'):  # 저장
-        save_path = f"face_data/{label}/{label}_{count:03d}.jpg"
+        save_path = f"face_data/{label}/{label}_000{count:03d}.jpg"
         cv2.imwrite(save_path, frame)
         img_counts[label] += 1
         print(f"✔ Saved: {save_path}")
