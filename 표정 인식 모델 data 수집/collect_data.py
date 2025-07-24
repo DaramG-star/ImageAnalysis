@@ -2,7 +2,7 @@ import cv2
 import os
 
 # 사용할 표정 라벨 리스트
-expressions = ['yawn', 'serious']
+expressions = ['yawn', 'serious', 'laugh', 'surprise', 'ugly']
 current_idx = 0
 img_counts = {}
 for label in expressions:
