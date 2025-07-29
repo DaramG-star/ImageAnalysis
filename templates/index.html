@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>얼굴 태깅 데모</title>
+</head>
+<body>
+  <h2>👤 유저 프로필 등록</h2>
+  <form action="/register" method="post" enctype="multipart/form-data">
+    이름: <input type="text" name="user_id"><br><br>
+    프로필 사진 선택 (여러 장 가능): <input type="file" name="profile_images" multiple><br><br>
+    <input type="submit" value="등록">
+  </form>
+
+  <h2>📷 사진 업로드</h2>
+  <form action="/upload" method="post" enctype="multipart/form-data">
+    사진 선택 (여러 장 가능): <input type="file" name="photos" multiple><br><br>
+    <input type="submit" value="업로드">
+  </form>
+</body>
+</html>

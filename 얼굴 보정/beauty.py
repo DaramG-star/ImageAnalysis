@@ -1,95 +1,132 @@
 import cv2
 import numpy as np
+import mediapipe as mp
+
+mp_face_mesh = mp.solutions.face_mesh
+face_mesh = mp_face_mesh.FaceMesh(static_image_mode=False, max_num_faces=1)
+
+# 입술 랜드마크 index
+LIPS_IDX = [61, 146, 91, 181, 84, 17, 314, 405, 321, 375, 291,
+            308, 324, 318, 402, 317, 14, 87, 178, 88, 95]
 
 def adjust_gamma(image, gamma=1.0):
-    """
-    감마 보정을 사용하여 이미지 밝기를 조절합니다.
-    gamma < 1.0 이면 이미지가 어두워지고, gamma > 1.0 이면 밝아집니다.
-    """
-    # 감마 값이 0이 되는 것을 방지하여 오류를 막습니다.
-    if gamma == 0:
+    if gamma <= 0:
         gamma = 0.01
-        
     inv_gamma = 1.0 / gamma
-    # 룩업 테이블 생성
     table = np.array([((i / 255.0) ** inv_gamma) * 255
-                      for i in np.arange(0, 256)]).astype("uint8")
-    # 룩업 테이블을 사용하여 감마 보정 적용
+                      for i in np.arange(256)]).astype("uint8")
     return cv2.LUT(image, table)
 
+def adjust_contrast(image, alpha=1.0):
+    return cv2.convertScaleAbs(image, alpha=alpha, beta=0)
 
-# ⭐️ gamma 값을 인자로 받도록 함수 수정
-def beautify_face(image, gamma=1.5):
-    """
-    주어진 이미지에 대해 뷰티 필터를 적용합니다.
-    (밝기 조절 부분이 감마 보정으로 변경되었습니다)
-    """
-
-    # 1. Bilateral Filter 적용
-    bilateral = cv2.bilateralFilter(image, d=9, sigmaColor=75, sigmaSpace=75)
-
-    # 2. Canny Edge Detection 적용
-    edges = cv2.Canny(image, 100, 200)
-
-    # 3. 필터 결합 (피부 영역에만 블러 적용)
+def get_skin_mask(image):
     img_float = image.astype(np.float32) / 255.0
     r, g, b = img_float[:,:,2], img_float[:,:,1], img_float[:,:,0]
-    
-    skin_mask = (r > 0.3725) & (g > 0.1568) & (b > 0.0784) & (r > b) & \
-                ((np.maximum(np.maximum(r, g), b) - np.minimum(np.minimum(r, g), b)) > 0.0588) & \
-                (np.abs(r - g) > 0.0588)
-    
-    non_edge_mask = edges < 50
-    final_mask = (skin_mask & non_edge_mask).astype(np.uint8)
-    final_mask_3channel = cv2.cvtColor(final_mask, cv2.COLOR_GRAY2BGR)
 
-    beautified_image = np.where(final_mask_3channel == 1, bilateral, image)
-    
-    # 4. 밝기 및 채도 조절
-    # 채도를 10% 증가시킵니다.
-    hsv = cv2.cvtColor(beautified_image, cv2.COLOR_BGR2HSV)
-    hsv[:, :, 1] = np.clip(hsv[:, :, 1] * 1.1, 0, 255)
-    beautified_image = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
-    
-    # ⭐️ 인자로 받은 gamma 값을 사용하여 밝기 조절
-    final_result = adjust_gamma(beautified_image, gamma=gamma)
+    mask_rgb = (r > 0.3725) & (g > 0.1568) & (b > 0.0784) & \
+               (r > b) & ((np.maximum.reduce([r, g, b]) - np.minimum.reduce([r, g, b])) > 0.0588) & \
+               (np.abs(r - g) > 0.0588)
 
-    return final_result
+    ycrcb = cv2.cvtColor(image, cv2.COLOR_BGR2YCrCb)
+    y, cr, cb = cv2.split(ycrcb)
+    mask_ycrcb = (133 < cr) & (cr < 173) & (77 < cb) & (cb < 127)
+
+    return (mask_rgb & mask_ycrcb).astype(np.uint8)
+
+def beautify_face(image, gamma=1.5, contrast=1.2, smoothness=30, saturation=1.1):
+    smoothed = cv2.edgePreservingFilter(image, flags=1, sigma_s=smoothness, sigma_r=0.2)
+
+    skin_mask = get_skin_mask(image)
+    skin_mask_blur = cv2.GaussianBlur(skin_mask.astype(np.float32), (5, 5), 0)
+    skin_mask_blur = np.clip(skin_mask_blur, 0, 1)[..., np.newaxis]
+
+    blended = (smoothed.astype(np.float32) * skin_mask_blur +
+               image.astype(np.float32) * (1 - skin_mask_blur)).astype(np.uint8)
+
+    hsv = cv2.cvtColor(blended, cv2.COLOR_BGR2HSV).astype(np.float32)
+    hsv[:, :, 1] = np.clip(hsv[:, :, 1] * saturation, 0, 255)
+    beautified = cv2.cvtColor(hsv.astype(np.uint8), cv2.COLOR_HSV2BGR)
+
+    beautified = adjust_gamma(beautified, gamma)
+    beautified = adjust_contrast(beautified, contrast)
+
+    return beautified
+
+def apply_lip_color(frame, color=(0, 0, 255), alpha=0.5, blur_size=15):
+    h, w, _ = frame.shape
+    rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    results = face_mesh.process(rgb)
+
+    if not results.multi_face_landmarks:
+        return frame
+
+    for face_landmarks in results.multi_face_landmarks:
+        points = np.array([(int(lm.x * w), int(lm.y * h))
+                           for i, lm in enumerate(face_landmarks.landmark) if i in LIPS_IDX],
+                          dtype=np.int32)
+
+        hull = cv2.convexHull(points)
+
+        # 마스크는 흑백으로 (알파용)
+        mask = np.zeros(frame.shape[:2], dtype=np.uint8)
+        cv2.fillConvexPoly(mask, hull, 255)
+
+        # 블러를 줘서 경계 부드럽게
+        mask = cv2.GaussianBlur(mask, (blur_size, blur_size), 7)
+        mask_f = (mask.astype(float) / 255.0) * alpha
+
+        # 색상을 입힌 레이어 생성
+        color_layer = np.full_like(frame, color, dtype=np.uint8)
+
+        # 알파 블렌딩 (픽셀 단위)
+        blended = frame.astype(float) * (1 - mask_f[..., None]) + color_layer.astype(float) * mask_f[..., None]
+
+        frame = blended.astype(np.uint8)
+
+    return frame
 
 
-# --- 메인 실행 부분 ---
+# ---------------- 메인 실행 ----------------
 if __name__ == "__main__":
     cap = cv2.VideoCapture(0)
     if not cap.isOpened():
-        print("웹캠을 열 수 없습니다.")
+        print("❌ 웹캠을 열 수 없습니다.")
         exit()
-        
-    window_name = 'Beautify Face Demo - Original vs. Result'
-    # ⭐️ 윈도우를 먼저 생성합니다.
+
+    window_name = 'Beautify + Lip Color'
     cv2.namedWindow(window_name)
 
-    # ⭐️ 'Gamma'라는 이름의 조절 바를 생성합니다.
-    # 범위는 0-300, 기본값은 150 (gamma 1.5에 해당)
-    cv2.createTrackbar('Gamma', window_name, 150, 300, lambda x:None)
+    cv2.createTrackbar('Gamma', window_name, 150, 300, lambda x: None)
+    cv2.createTrackbar('Contrast', window_name, 120, 300, lambda x: None)
+    cv2.createTrackbar('Smoothness', window_name, 30, 100, lambda x: None)
+    cv2.createTrackbar('Saturation', window_name, 110, 200, lambda x: None)
+    cv2.createTrackbar('Lip Alpha', window_name, 40, 100, lambda x: None)  # 0.0~1.0
+    cv2.createTrackbar('Lip Blur', window_name, 15, 30, lambda x: None)  # 1~30
 
-    print("프로그램 종료: 'q' 키를 누르세요.")
+    print("🎥 실행 중... 종료: q")
 
     while True:
         ret, frame = cap.read()
         if not ret:
-            print("프레임을 읽을 수 없습니다.")
             break
 
-        # ⭐️ 조절 바에서 현재 감마 값을 읽어옵니다.
-        gamma_val_int = cv2.getTrackbarPos('Gamma', window_name)
-        # 정수 값을 float으로 변환 (150 -> 1.5)
-        gamma_val_float = gamma_val_int / 100.0
+        gamma_val = cv2.getTrackbarPos('Gamma', window_name) / 100.0
+        contrast_val = cv2.getTrackbarPos('Contrast', window_name) / 100.0
+        smooth_val = cv2.getTrackbarPos('Smoothness', window_name)
+        saturation_val = cv2.getTrackbarPos('Saturation', window_name) / 100.0
+        lip_alpha = cv2.getTrackbarPos('Lip Alpha', window_name) / 100.0 
+        lip_blur = cv2.getTrackbarPos('Lip Blur', window_name)
 
-        # ⭐️ 뷰티 필터에 감마 값을 전달합니다.
-        beautified_frame = beautify_face(frame, gamma=gamma_val_float)
-        
-        combined_view = np.hstack((frame, beautified_frame))
-        cv2.imshow(window_name, combined_view)
+        beautified = beautify_face(frame, gamma=gamma_val,
+                                   contrast=contrast_val,
+                                   smoothness=smooth_val,
+                                   saturation=saturation_val)
+
+        final_frame = apply_lip_color(beautified, color=(0, 0, 255), alpha=lip_alpha, blur_size=15)
+
+        combined = np.hstack((frame, final_frame))
+        cv2.imshow(window_name, combined)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break

@@ -1,0 +1,4 @@
+# .gitignore 파일
+
+# vosk 모델 폴더 무시
+STT/vosk-model-small-ko-0.22/

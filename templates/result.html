@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>태그 결과</title>
+</head>
+<body>
+  <h2>📌 태깅 결과</h2>
+  {% for filename, tags in results.items() %}
+    <p>
+      <strong>{{ filename }}</strong> →
+      {% if tags %}
+        {{ ", ".join(tags) }}
+      {% else %}
+        태그 없음
+      {% endif %}
+    </p>
+  {% endfor %}
+  <a href="/">⬅ 다시</a>
+</body>
+</html>
