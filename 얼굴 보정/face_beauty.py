@@ -68,7 +68,7 @@ while True:
         break
     frame_count += 1
 
-    if frame_count % skip_rate == 0:  # 2프레임마다 Mediapipe 실행
+    if frame_count % skip_rate == 0:  
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         results = face_mesh.process(rgb)
 

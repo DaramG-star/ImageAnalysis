@@ -7,7 +7,7 @@ import tensorflow as tf
 label_names = ['bad', 'fist', 'good', 'gun', 'heart', 'none', 'ok', 'open_palm', 'promise', 'rock', 'victory']
 
 # TFLite 모델 로드
-interpreter = tf.lite.Interpreter(model_path="stop_hands/gesture_model4.tflite")
+interpreter = tf.lite.Interpreter(model_path="stop_hands/gesture_model6.tflite")
 interpreter.allocate_tensors()
 input_details = interpreter.get_input_details()
 output_details = interpreter.get_output_details()

@@ -2,3 +2,6 @@
 
 # vosk 모델 폴더 무시
 STT/vosk-model-small-ko-0.22/
+# Python 가상환경 무시
+.venv/
+venv/
