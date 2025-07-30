@@ -3,7 +3,7 @@ import os
 import csv
 import mediapipe as mp
 
-label_names = ["bad", "fist", "good", "heart", "none", "ok", "open_palm", "promise", "victory", "gun", "rock"]
+label_names = ["none"]
 csv_path = "hand_landmarks.csv"
 
 mp_hands = mp.solutions.hands
