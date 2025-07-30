@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>통합 실시간 인식 시스템</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #2c2c2c;
+            color: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        h1 {
+            color: #4CAF50;
+        }
+        #video-container {
+            border: 5px solid #4CAF50;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.7);
+            background-color: #000;
+        }
+    </style>
+</head>
+<body>
+    <h1>🤖 통합 실시간 인식 시스템 📹</h1>
+    <p>뷰티 필터, 표정 인식, 손동작 인식이 모두 적용된 영상입니다.</p>
+    <div id="video-container">
+        <img src="{{ url_for('video_feed') }}" width="960" alt="Video Stream">
+    </div>
+</body>
+</html>
