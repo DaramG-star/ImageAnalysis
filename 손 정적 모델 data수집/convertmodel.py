@@ -1,7 +1,7 @@
 import tensorflow as tf
 
 # 1. Keras 모델 로드
-model = tf.keras.models.load_model("stop_hands/gesture_model6.h5")
+model = tf.keras.models.load_model("stop_hands/gesture_model7.h5")
 
 # 2. TFLite Converter 생성
 converter = tf.lite.TFLiteConverter.from_keras_model(model)
@@ -13,7 +13,7 @@ converter.optimizations = [tf.lite.Optimize.DEFAULT]
 tflite_model = converter.convert()
 
 # 5. 저장
-with open("stop_hands/gesture_model6.tflite", "wb") as f:
+with open("stop_hands/gesture_model7.tflite", "wb") as f:
     f.write(tflite_model)
 
-print("✅ gesture_model5.tflite 저장 완료!")
+print("✅ gesture_model7.tflite 저장 완료!")
