@@ -4,7 +4,7 @@ import mediapipe as mp
 import tensorflow as tf
 import time
 
-model_path = "moving_hands/gesture_rnn_model3.tflite"
+model_path = "moving_hands/gesture_rnn_model3_quant.tflite"
 gestures = ['fire', 'hi', 'hit', 'none', 'nono', 'nyan', 'shot']
 
 images = {
