@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>분석 결과</title>
+    <style>
+        body { font-family: sans-serif; margin: 2em; }
+        h1 { color: #333; }
+        table { width: 100%; border-collapse: collapse; margin-top: 2em; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .back-link { margin-top: 2em; display: inline-block; }
+    </style>
+</head>
+<body>
+    <h1>🔬 분석 결과</h1>
+    {% if results %}
+        <table>
+            <thead>
+                <tr>
+                    <th>유형</th>
+                    <th>파일 1</th>
+                    <th>파일 2</th>
+                    <th>분석 값</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in results %}
+                <tr>
+                    <td>{{ result.Type }}</td>
+                    <td>{{ result.File1 }}</td>
+                    <td>{{ result.File2 }}</td>
+                    <td>{{ result.Value }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>분석 결과가 없습니다. 이미지를 다시 확인해주세요.</p>
+    {% endif %}
+    <a href="/" class="back-link">← 돌아가기</a>
+</body>
+</html>

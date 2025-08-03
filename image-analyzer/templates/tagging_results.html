@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>인물 태깅 분석 결과</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 2em; background-color: #f8f9fa; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #007bff; text-align: center; }
+        .results-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5em; margin-top: 2em; }
+        .result-item { background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow: hidden; }
+        .result-item img { width: 100%; height: auto; display: block; }
+        .no-results { text-align: center; font-size: 1.2em; color: #6c757d; margin-top: 3em; }
+        .back-link { display: inline-block; margin-top: 2em; padding: 0.8em 1.5em; background-color: #6c757d; color: white; text-decoration: none; border-radius: 5px; transition: background-color 0.2s; }
+        .back-link:hover { background-color: #5a6268; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>👤 인물 태깅 분석 결과</h1>
+        
+        {% if tagged_images %}
+            <div class="results-grid">
+                {% for image_path in tagged_images %}
+                <div class="result-item">
+                    <img src="{{ url_for('static', filename=image_path) }}" alt="Tagged Image">
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="no-results">업로드된 사진에서 기준 인물과 일치하는 얼굴을 찾지 못했습니다.</p>
+        {% endif %}
+
+        <a href="/" class="back-link">← 처음으로 돌아가기</a>
+    </div>
+</body>
+</html>
