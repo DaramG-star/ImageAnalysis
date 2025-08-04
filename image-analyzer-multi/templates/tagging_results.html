@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>분석 결과</title>
+    <style>
+        body { font-family: sans-serif; margin: 2em; }
+        h1 { color: #333; }
+        table { width: 100%; border-collapse: collapse; margin-top: 2em; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .group-box { border: 1px solid #ccc; padding: 10px; margin-bottom: 20px; }
+        .group-title { font-weight: bold; margin-bottom: 10px; }
+        .group-images img { width: 150px; margin: 5px; border: 1px solid #ddd; }
+        /* 태그된 이미지 크기를 유사 이미지와 맞춤 */
+        .tagged img { width: 150px; margin: 5px; border: 2px solid #5cb85c; }
+    </style>
+</head>
+<body>
+    <h1>🔍 분석 결과</h1>
+
+    <h2>📷 흐림 사진</h2>
+    {% if results %}
+    <table>
+        <thead>
+            <tr><th>파일명</th><th>흐림 여부</th><th>Laplacian 값</th></tr>
+        </thead>
+        <tbody>
+            {% for r in results %}
+            {% if r.Blur %}
+            <tr>
+                <td>{{ r.File }}</td>
+                <td>흐림</td>
+                <td>{{ "%.2f"|format(r.LaplacianVar) }}</td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>흐림 사진 없음</p>
+    {% endif %}
+
+    <h2>🧩 유사 사진 그룹</h2>
+    {% if groups %}
+        {% for group in groups %}
+        <div class="group-box">
+            <div class="group-title">유사 사진 그룹 (기준: {{ group[0] }})</div>
+            <div class="group-images">
+                {% for img in group %}
+                <img src="{{ url_for('uploaded_source_file', filename=img) }}" alt="{{ img }}">
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+    <p>유사 그룹 없음</p>
+    {% endif %}
+
+    <h2>🏷️ 얼굴 태그 결과</h2>
+    {% if tagged_images %}
+        {% for name, images in tagged_images.items() %}
+        <div class="group-box">
+            <div class="group-title">인물: {{ name }}</div>
+            <div class="tagged">
+                {% for img in images %}
+                <img src="{{ url_for('static', filename='results/' + img) }}" alt="{{ img }}">
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+    <p>태그된 얼굴 이미지 없음</p>
+    {% endif %}
+</body>
+</html>

@@ -10,34 +10,58 @@
         th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
         th { background-color: #f2f2f2; }
         .back-link { margin-top: 2em; display: inline-block; }
+        .group-box { border: 1px solid #ccc; padding: 10px; margin-bottom: 20px; }
+        .group-title { font-weight: bold; margin-bottom: 10px; }
+        .group-images img { width: 150px; margin: 5px; border: 1px solid #ddd; }
     </style>
 </head>
 <body>
     <h1>🔬 분석 결과</h1>
+
+    <!-- 흐림 사진 결과 -->
+    <h2>📷 흐림 사진</h2>
     {% if results %}
         <table>
             <thead>
                 <tr>
-                    <th>유형</th>
-                    <th>파일 1</th>
-                    <th>파일 2</th>
-                    <th>분석 값</th>
+                    <th>파일명</th>
+                    <th>흐림 여부</th>
+                    <th>Laplacian 값</th>
                 </tr>
             </thead>
             <tbody>
-                {% for result in results %}
-                <tr>
-                    <td>{{ result.Type }}</td>
-                    <td>{{ result.File1 }}</td>
-                    <td>{{ result.File2 }}</td>
-                    <td>{{ result.Value }}</td>
-                </tr>
+                {% for r in results %}
+                    {% if r.Blur %}
+                    <tr>
+                        <td>{{ r.File }}</td>
+                        <td>흐림</td>
+                        <td>{{ "%.2f"|format(r.LaplacianVar) }}</td>
+                    </tr>
+                    {% endif %}
                 {% endfor %}
             </tbody>
         </table>
     {% else %}
-        <p>분석 결과가 없습니다. 이미지를 다시 확인해주세요.</p>
+        <p>흐림 사진 결과가 없습니다.</p>
     {% endif %}
+
+    <!-- 유사 사진 그룹 결과 -->
+    <h2>📸 유사 사진 그룹</h2>
+    {% if groups %}
+        {% for group in groups %}
+        <div class="group-box">
+            <div class="group-title">기준 사진: {{ group[0] }}</div>
+            <div class="group-images">
+                {% for img in group %}
+                    <img src="{{ url_for('static', filename='results/' + img) }}" alt="{{ img }}">
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p>유사한 사진 그룹이 없습니다.</p>
+    {% endif %}
+
     <a href="/" class="back-link">← 돌아가기</a>
 </body>
 </html>

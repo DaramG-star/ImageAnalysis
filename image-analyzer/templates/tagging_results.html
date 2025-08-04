@@ -21,10 +21,8 @@
         
         {% if tagged_images %}
             <div class="results-grid">
-                {% for image_path in tagged_images %}
-                <div class="result-item">
-                    <img src="{{ url_for('static', filename=image_path) }}" alt="Tagged Image">
-                </div>
+                {% for img in tagged_images %}
+                    <img src="{{ url_for('static', filename='results/' + img) }}" alt="Tagged Image">
                 {% endfor %}
             </div>
         {% else %}

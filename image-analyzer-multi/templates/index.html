@@ -1,0 +1,29 @@
+<form method="POST" action="/analyze_all" enctype="multipart/form-data">
+  <h3>기준 인물들 (사진과 이름을 같이 입력하세요)</h3>
+  <div id="targets">
+    <div class="target-input">
+      <input type="file" name="target_images" required>
+      <input type="text" name="target_names" placeholder="예: 수연이" required>
+    </div>
+  </div>
+  <button type="button" onclick="addTargetInput()">+ 인물 추가</button>
+
+  <br><br>
+  <h3>분석할 이미지들</h3>
+  <input type="file" name="source_images" multiple required><br><br>
+
+  <button type="submit">분석 시작</button>
+</form>
+
+<script>
+function addTargetInput() {
+  const container = document.getElementById("targets");
+  const div = document.createElement("div");
+  div.className = "target-input";
+  div.innerHTML = `
+    <input type="file" name="target_images" required>
+    <input type="text" name="target_names" placeholder="예: 수연이" required>
+  `;
+  container.appendChild(div);
+}
+</script>
