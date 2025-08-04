@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>이미지 분석 결과</title>
+</head>
+<body>
+  <h2>이미지 3장 업로드</h2>
+  <form action="/upload" method="post" enctype="multipart/form-data">
+    <input type="file" name="image1" accept="image/*" required><br>
+    <input type="file" name="image2" accept="image/*" required><br>
+    <input type="file" name="image3" accept="image/*" required><br><br>
+    <button type="submit">제목/설명 추천받기</button>
+  </form>
+
+  {% if titles %}
+    <h3>제목 추천</h3>
+    <ul>
+      {% for title in titles %}
+        <li>{{ title }}</li>
+      {% endfor %}
+    </ul>
+    <h3>설명 추천</h3>
+    <ul>
+      {% for desc in descriptions %}
+        <li>{{ desc }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+</body>
+</html>
