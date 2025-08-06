@@ -2,30 +2,38 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>이미지 분석 결과</title>
+  <title>앨범 제목 추천기</title>
+  <style>
+    body { font-family: sans-serif; max-width: 800px; margin: auto; padding: 2em; }
+    h1 { color: #2e8b57; }
+    .preview { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+    .preview img { width: 200px; border: 1px solid #ccc; }
+    pre { background: #f9f9f9; padding: 1em; border: 1px solid #ddd; white-space: pre-wrap; }
+  </style>
 </head>
 <body>
-  <h2>이미지 3장 업로드</h2>
-  <form action="/upload" method="post" enctype="multipart/form-data">
-    <input type="file" name="image1" accept="image/*" required><br>
-    <input type="file" name="image2" accept="image/*" required><br>
-    <input type="file" name="image3" accept="image/*" required><br><br>
-    <button type="submit">제목/설명 추천받기</button>
+  <h1>📸 앨범 제목 & 설명 추천기</h1>
+
+  <form action="/recommend" method="post" enctype="multipart/form-data">
+    <input type="file" name="files" multiple required>
+    <button type="submit">제목 추천 받기</button>
   </form>
 
-  {% if titles %}
-    <h3>제목 추천</h3>
-    <ul>
-      {% for title in titles %}
-        <li>{{ title }}</li>
+  {% if uploaded_images %}
+    <div class="preview">
+      {% for img in uploaded_images %}
+        <img src="/static/uploaded/{{ img }}" alt="image">
       {% endfor %}
-    </ul>
-    <h3>설명 추천</h3>
-    <ul>
-      {% for desc in descriptions %}
-        <li>{{ desc }}</li>
-      {% endfor %}
-    </ul>
+    </div>
+  {% endif %}
+
+  {% if result_text %}
+    <h2>📝 추천 결과</h2>
+    <pre>{{ result_text }}</pre>
+  {% endif %}
+
+  {% if error %}
+    <p style="color:red">{{ error }}</p>
   {% endif %}
 </body>
 </html>
