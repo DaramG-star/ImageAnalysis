@@ -8,9 +8,6 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 # ───── 설정 ─────
-GMS_API_KEY = "S13P11D207-5c0c5457-4c6d-464c-bce9-8ebd9322c10d"
-GMS_API_URL = "https://gms.ssafy.io/gmsapi/api.openai.com/v1/chat/completions"
-IMGBB_API_KEY = "92ac342bed6eaabe3f5434d481cf4b39"
 
 UPLOAD_DIR = "static/uploaded"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
