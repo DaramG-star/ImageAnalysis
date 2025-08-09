@@ -1,10 +1,9 @@
-# app.py
 import os
-import shutil
 import cv2
 import torch
 import torch.nn.functional as F
 import numpy as np
+import requests
 from torchvision import models, transforms
 from flask import Flask, request, render_template, send_from_directory
 from insightface.app import FaceAnalysis
@@ -62,6 +61,20 @@ def laplacian_var(image):
     else:
         gray = image
     return cv2.Laplacian(gray, cv2.CV_64F).var()
+
+def download_image(url, save_path):
+    try:
+        response = requests.get(url, timeout=5)
+        if response.status_code == 200:
+            with open(save_path, 'wb') as f:
+                f.write(response.content)
+            return True
+        else:
+            print(f"[실패] 다운로드 실패: {url}")
+            return False
+    except Exception as e:
+        print(f"[오류] 다운로드 중 예외 발생: {url} / {e}")
+        return False
 
 # ===== 분석 =====
 def analyze_all(target_dir, source_dir, result_dir, blur_th=100, sim_th=0.9, tag_th=0.6):
@@ -131,7 +144,6 @@ def analyze_all(target_dir, source_dir, result_dir, blur_th=100, sim_th=0.9, tag
         else:
             print(f"[경고] 기준 인물 얼굴 인식 실패: {f}")
 
-    # tagged_images를 딕셔너리로 변경
     tagged_images = defaultdict(list)
     for f in os.listdir(source_dir):
         spath = os.path.join(source_dir, f)
@@ -140,7 +152,7 @@ def analyze_all(target_dir, source_dir, result_dir, blur_th=100, sim_th=0.9, tag
             continue
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         faces = face_app.get(img_rgb)
-        
+
         tagged_in_image = False
         names_found = set()
 
@@ -166,7 +178,6 @@ def analyze_all(target_dir, source_dir, result_dir, blur_th=100, sim_th=0.9, tag
             if result:
                 with open(os.path.join(result_dir, out_name), "wb") as file:
                     file.write(buffer)
-            # 찾은 모든 이름에 대해 이미지를 추가
             for name in names_found:
                 tagged_images[name].append(out_name)
 
@@ -196,17 +207,21 @@ def analyze_all_route():
     clear_folder(SOURCE_DIR)
     clear_folder(RESULT_DIR)
 
-    target_images = request.files.getlist("target_images")
+    target_urls = request.form.getlist("target_urls")
     target_names = request.form.getlist("target_names")
 
-    for img, name in zip(target_images, target_names):
-        if name.strip() and img.filename:
+    for url, name in zip(target_urls, target_names):
+        if name.strip() and url.strip():
             filename = f"{name.strip()}.jpg"
-            img.save(os.path.join(TARGET_DIR, filename))
+            save_path = os.path.join(TARGET_DIR, filename)
+            download_image(url.strip(), save_path)
 
-    for f in request.files.getlist("source_images"):
-        if f.filename:
-            f.save(os.path.join(SOURCE_DIR, f.filename))
+    source_urls = request.form.getlist("source_urls")
+    for i, url in enumerate(source_urls):
+        if url.strip():
+            filename = f"source_{i}.jpg"
+            save_path = os.path.join(SOURCE_DIR, filename)
+            download_image(url.strip(), save_path)
 
     results, groups, tagged_images = analyze_all(TARGET_DIR, SOURCE_DIR, RESULT_DIR)
     return render_template("tagging_results.html", results=results, groups=groups, tagged_images=tagged_images)

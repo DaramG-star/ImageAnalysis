@@ -13,7 +13,7 @@ tf.get_logger().setLevel('ERROR')
 
 # ---------- TFLite 모델 ----------
 static_interpreter  = tf.lite.Interpreter(model_path="stop_hands/gesture_model7.tflite")
-dynamic_interpreter = tf.lite.Interpreter(model_path="moving_hands/gesture_rnn_model3.tflite")
+dynamic_interpreter = tf.lite.Interpreter(model_path="moving_hands/gesture_rnn_model5.tflite")
 static_interpreter.allocate_tensors()
 dynamic_interpreter.allocate_tensors()
 si_in,  si_out  = static_interpreter.get_input_details()[0]['index'],  static_interpreter.get_output_details()[0]['index']

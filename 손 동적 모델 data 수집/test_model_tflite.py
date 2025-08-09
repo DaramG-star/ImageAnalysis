@@ -5,7 +5,7 @@ import tensorflow as tf
 import os
 import time
 
-model_path = "moving_hands/gesture_rnn_model3.tflite"
+model_path = "moving_hands/gesture_rnn_model5.tflite"
 
 # 이동 관련 설정
 prev_wrist = None

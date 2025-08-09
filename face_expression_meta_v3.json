@@ -1,0 +1,28 @@
+{
+  "labels": [
+    "laugh",
+    "serious",
+    "surprise",
+    "yawn",
+    "none"
+  ],
+  "feature_index": {
+    "eye_open": 0,
+    "mouth_h": 1,
+    "mouth_w": 2,
+    "brow_lift": 3,
+    "eye_ratio": 4,
+    "mouth_ratio": 5,
+    "brow_mouth_ratio": 6,
+    "mouth_droop": 7,
+    "mouth_asym": 8,
+    "cheek_puff": 9,
+    "mouth_tilt": 10,
+    "eye_mouth_coupling": 11
+  },
+  "surprise_thresholds": {
+    "mouth_h_q25": 0.16056890040636063,
+    "eye_open_q25": 0.09931505098938942,
+    "brow_lift_q25": 0.298163041472435
+  }
+}
